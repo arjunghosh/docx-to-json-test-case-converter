@@ -135,12 +135,16 @@
         .platform-strip .ps-label{font-size:0.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;font-weight:700}
         .platform-strip span.ps-tag{padding:4px 12px;border-radius:6px;font-size:0.78rem;font-weight:600;background:var(--surface);border:1px solid var(--border);color:var(--text2)}
 
-        /* ---- Terminal demo ---- */
-        .terminal{max-width:680px;margin:0 auto;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border-bright);box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 60px var(--glow2)}
-        .terminal-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border)}
-        .terminal-dot{width:10px;height:10px;border-radius:50%}
-        .terminal-bar span{flex:1;text-align:center;font-size:0.75rem;color:var(--text3);font-weight:500}
-        .terminal-body{padding:16px 20px;background:var(--surface);font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.7}
+        /* ---- Dual demo ---- */
+        .dual-demo{max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .demo-panel{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border-bright);box-shadow:0 16px 40px rgba(0,0,0,0.3),0 0 40px var(--glow2)}
+        .demo-bar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border)}
+        .demo-dot{width:8px;height:8px;border-radius:50%}
+        .demo-bar .demo-title{flex:1;text-align:center;font-size:0.75rem;font-weight:600}
+        .demo-bar .demo-title .mode-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.68rem;font-weight:700;margin-left:6px}
+        .mode-cli{background:rgba(52,211,153,0.15);color:var(--green)}
+        .mode-lib{background:rgba(124,106,255,0.15);color:var(--accent2)}
+        .demo-body{padding:14px 16px;background:var(--surface);font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.7}
         .t-prompt{color:var(--green)}
         .t-cmd{color:var(--text)}
         .t-comment{color:var(--text3)}
@@ -148,6 +152,8 @@
         .t-str{color:var(--cyan)}
         .t-out{color:var(--text2)}
         .t-pass{color:var(--green);font-weight:600}
+        .t-kw{color:var(--accent2)}
+        .t-fn{color:var(--cyan)}
 
         /* ---- Stats ribbon ---- */
         .stats{padding:60px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,transparent,var(--glow2),transparent)}
@@ -233,6 +239,7 @@
             .stats-grid{grid-template-columns:repeat(2,1fr)}
             .stat-item:nth-child(2)::after{display:none}
             .hero-info{grid-template-columns:1fr}
+            .dual-demo{grid-template-columns:1fr}
         }
         @media(max-width:640px){
             .hero{padding:40px 0 30px}
@@ -327,21 +334,41 @@
             <a href="#code" class="btn btn-ghost">Get Started</a>
         </div>
 
-        <!-- Compact terminal -->
-        <div class="terminal">
-            <div class="terminal-bar">
-                <div class="terminal-dot" style="background:#ff5f57"></div>
-                <div class="terminal-dot" style="background:#febc2e"></div>
-                <div class="terminal-dot" style="background:#28c840"></div>
-                <span>Terminal</span>
-                <div style="width:36px"></div>
+        <!-- Dual mode demo: CLI + Python Library -->
+        <div class="dual-demo">
+            <div class="demo-panel">
+                <div class="demo-bar">
+                    <div class="demo-dot" style="background:#ff5f57"></div>
+                    <div class="demo-dot" style="background:#febc2e"></div>
+                    <div class="demo-dot" style="background:#28c840"></div>
+                    <span class="demo-title"><span class="mode-badge mode-cli">CLI Tool</span></span>
+                </div>
+                <div class="demo-body">
+                    <span class="t-prompt">$</span> python docx_to_json_tool.py <span class="t-flag">convert</span> <span class="t-str">tests.docx</span><br>
+                    <br>
+                    <span class="t-out">&nbsp;&nbsp;Parsed <strong>8</strong> sections, <strong>42</strong> test cases</span><br>
+                    <span class="t-out">&nbsp;&nbsp;JSON: output/tests.json</span><br>
+                    <span class="t-out">&nbsp;&nbsp;JSONL: output/tests.jsonl</span><br>
+                    <span class="t-out">&nbsp;&nbsp;QA: </span><span class="t-pass">45/45</span><span class="t-out"> &middot; Diff: </span><span class="t-pass">PASS</span><br>
+                    <span class="t-out">&nbsp;&nbsp;Status: </span><span class="t-pass">PASS</span> <span class="t-out">&#10004; AI Foundry ready</span>
+                </div>
             </div>
-            <div class="terminal-body">
-                <span class="t-prompt">$</span> <span class="t-cmd">python docx_to_json_tool.py convert</span> <span class="t-str">my_test_cases.docx</span><br>
-                <span class="t-out">&nbsp;&nbsp;Parsed <strong>8</strong> sections, <strong>42</strong> test cases</span><br>
-                <span class="t-out">&nbsp;&nbsp;JSON: output/my_test_cases.json &nbsp;JSONL: output/my_test_cases.jsonl</span><br>
-                <span class="t-out">&nbsp;&nbsp;QA: </span><span class="t-pass">45/45 passed</span><span class="t-out"> &nbsp;Delta-Diff: </span><span class="t-pass">PASS</span><span class="t-out"> &nbsp;Structure: </span><span class="t-pass">PASS</span><br>
-                <span class="t-out">&nbsp;&nbsp;Status: </span><span class="t-pass">PASS</span> <span class="t-out">-- Ready for AI Foundry upload</span>
+            <div class="demo-panel">
+                <div class="demo-bar">
+                    <div class="demo-dot" style="background:#ff5f57"></div>
+                    <div class="demo-dot" style="background:#febc2e"></div>
+                    <div class="demo-dot" style="background:#28c840"></div>
+                    <span class="demo-title"><span class="mode-badge mode-lib">Python Library</span></span>
+                </div>
+                <div class="demo-body">
+                    <span class="t-kw">from</span> docx_to_json_tool <span class="t-kw">import</span> <span class="t-fn">convert_docx</span><br>
+                    <br>
+                    result = <span class="t-fn">convert_docx</span>(<span class="t-str">"tests.docx"</span>)<br>
+                    <br>
+                    print(result[<span class="t-str">"status"</span>])&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-comment"># "PASS"</span><br>
+                    print(result[<span class="t-str">"json_path"</span>])&nbsp;<span class="t-comment"># .json path</span><br>
+                    print(result[<span class="t-str">"jsonl_path"</span>]) <span class="t-comment"># .jsonl path</span>
+                </div>
             </div>
         </div>
     </div>

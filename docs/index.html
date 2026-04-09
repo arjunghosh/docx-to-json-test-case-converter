@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO Meta Tags -->
+    <title>DOCX-to-JSON Test Case Converter | Convert Word Test Cases to JSON &amp; JSONL for AI Evaluation</title>
+    <meta name="description" content="Open-source Python CLI tool and library to convert structured Word (.docx) test case documents into validated JSON and JSONL files for Azure AI Foundry, Microsoft Co-Pilot Studio, and AI agent evaluation pipelines. 45+ built-in QA checks.">
+    <meta name="keywords" content="docx to json, word to json, test case converter, AI Foundry, JSONL, Azure AI, Microsoft Co-Pilot Studio, Power BI, AI agent testing, python cli tool, test case validation, docx parser, AI evaluation, LLM testing, agentic AI, prompt testing, expected behavior validation">
+    <meta name="author" content="Arjun Ghosh">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://arjunghosh.github.io/docx-to-json-test-case-converter/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://arjunghosh.github.io/docx-to-json-test-case-converter/">
+    <meta property="og:title" content="DOCX-to-JSON Test Case Converter | Convert Word Test Cases to JSON for AI Evaluation">
+    <meta property="og:description" content="Open-source Python tool to convert Word test case documents into validated JSON + JSONL for Azure AI Foundry and AI agent evaluation. 45+ automated QA checks, delta-diff validation, and dual CLI/library mode.">
+    <meta property="og:site_name" content="DOCX-to-JSON Test Case Converter">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@arjunghosh">
+    <meta name="twitter:creator" content="@arjunghosh">
+    <meta name="twitter:title" content="DOCX-to-JSON Test Case Converter">
+    <meta name="twitter:description" content="Convert Word test case documents into validated JSON + JSONL for Azure AI Foundry. Open-source Python CLI tool with 45+ QA checks.">
+
+    <!-- JSON-LD Structured Data: SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "DOCX-to-JSON Test Case Converter",
+        "description": "Open-source Python CLI tool and library that converts structured Word (.docx) test case documents into validated JSON and JSONL files for Azure AI Foundry agent evaluation, Microsoft Co-Pilot Studio testing, and AI agent QA pipelines.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Windows, macOS, Linux",
+        "programmingLanguage": "Python",
+        "softwareVersion": "3.0.0",
+        "license": "https://opensource.org/licenses/MIT",
+        "url": "https://github.com/arjunghosh/docx-to-json-test-case-converter",
+        "downloadUrl": "https://github.com/arjunghosh/docx-to-json-test-case-converter",
+        "codeRepository": "https://github.com/arjunghosh/docx-to-json-test-case-converter",
+        "author": {
+            "@type": "Person",
+            "name": "Arjun Ghosh",
+            "url": "https://www.loyla.ai/",
+            "sameAs": [
+                "https://github.com/arjunghosh",
+                "https://linkedin.com/in/arjunghosh",
+                "https://twitter.com/arjunghosh"
+            ]
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Loyla.ai",
+            "url": "https://www.loyla.ai/",
+            "description": "Multi-Agentic AI Products Lab"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Convert DOCX test cases to JSON and JSONL",
+            "45+ automated QA validation checks",
+            "Delta-diff validation between DOCX source and JSON output",
+            "Azure AI Foundry compatible JSONL output",
+            "Dual mode: CLI tool and Python library",
+            "Idempotent parser with Unicode normalization",
+            "JSON-to-JSON regression comparator",
+            "Timestamped output folders with validation reports"
+        ]
+    }
+    </script>
+
+    <!-- JSON-LD Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How do I convert a Word document to JSON for AI testing?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Install the DOCX-to-JSON Test Case Converter with 'pip install python-docx', then run 'python docx_to_json_tool.py convert your_test_cases.docx'. The tool parses structured test cases from your Word document and outputs validated JSON and JSONL files ready for Azure AI Foundry or any AI agent evaluation pipeline."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What format does the DOCX file need to be in?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The tool expects Word documents with sections marked as 'SECTION N --- Title', individual tests marked as 'Test N', 'User Prompt:' fields, 'Expected Behavior:' bullet lists, and optional 'Pass if:' / 'Fail if:' criteria. See the README for the full format specification."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I use this tool as a Python library instead of CLI?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. Import convert_docx from docx_to_json_tool and call result = convert_docx('my_tests.docx'). It returns a dict with status, file paths, parsed data, and validation reports. You can also import individual functions like parse_test_cases_from_docx, generate_jsonl, and run_generic_test_suite."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the JSONL format used for Azure AI Foundry?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Each line in the JSONL file is a self-contained JSON object with test_id, section, user_prompt, expected_behavior (array), and optional pass_criteria, fail_criteria, and precondition fields. This flat format can be uploaded directly to Azure AI Foundry's evaluation framework for AI agent testing."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How many validation checks does the tool run?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The tool runs approximately 45 automated QA checks across 11 categories: JSON structure, test case completeness, field validation, expected behavior content, special fields, AI Foundry compatibility, data type integrity, section integrity, prompt quality, delta-diff (DOCX vs JSON), and cross-reference consistency."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does this tool work with Microsoft Co-Pilot Studio test cases?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. The tool is designed for AI agent evaluation workflows including Microsoft Co-Pilot Studio, Power BI AI agents, and Azure AI Foundry. Any structured test-case document following the expected DOCX format can be converted and validated."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- Styles -->
+    <style>
+        :root {
+            --color-bg: #0a0a0f;
+            --color-surface: #12121a;
+            --color-surface-2: #1a1a26;
+            --color-border: #2a2a3a;
+            --color-text: #e4e4ef;
+            --color-text-muted: #8888a0;
+            --color-accent: #6c63ff;
+            --color-accent-light: #8b83ff;
+            --color-accent-glow: rgba(108, 99, 255, 0.15);
+            --color-green: #4ade80;
+            --color-orange: #fb923c;
+            --color-cyan: #22d3ee;
+            --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius: 12px;
+            --max-width: 960px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Nav --- */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-border);
+            padding: 0.75rem 1.5rem;
+        }
+        .nav-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .nav-brand {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--color-accent-light);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--color-accent-light); }
+
+        /* --- Hero --- */
+        .hero {
+            text-align: center;
+            padding: 5rem 1.5rem 3.5rem;
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            background: var(--color-accent-glow);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            color: var(--color-accent-light);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+            background: linear-gradient(135deg, #fff 0%, var(--color-accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--color-text-muted);
+            max-width: 640px;
+            margin: 0 auto 2rem;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--color-accent);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--color-accent-light);
+            box-shadow: 0 0 24px var(--color-accent-glow);
+        }
+        .btn-secondary {
+            background: var(--color-surface-2);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent-light);
+        }
+
+        /* --- Sections --- */
+        section {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 3.5rem 1.5rem;
+        }
+        section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        section .section-sub {
+            color: var(--color-text-muted);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        /* --- Feature Grid --- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+        .feature-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .feature-card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 20px var(--color-accent-glow);
+        }
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .feature-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            line-height: 1.55;
+        }
+
+        /* --- Code Block --- */
+        .code-block {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .code-header {
+            background: var(--color-surface-2);
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .code-header .dots {
+            display: flex; gap: 6px;
+        }
+        .code-header .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+        }
+        .dot-red { background: #ff5f57; }
+        .dot-yellow { background: #febc2e; }
+        .dot-green { background: #28c840; }
+        .code-block pre {
+            padding: 1.25rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.65;
+            color: var(--color-text);
+        }
+        .code-block code { font-family: inherit; }
+        .code-comment { color: #6a6a80; }
+        .code-string { color: var(--color-green); }
+        .code-keyword { color: var(--color-accent-light); }
+        .code-fn { color: var(--color-cyan); }
+
+        /* --- Pipeline --- */
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .pipeline-step {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1rem;
+            text-align: center;
+            position: relative;
+        }
+        .pipeline-step .step-num {
+            display: inline-block;
+            width: 28px; height: 28px;
+            line-height: 28px;
+            border-radius: 50%;
+            background: var(--color-accent);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .pipeline-step h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .pipeline-step p {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        /* --- Stats --- */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .stat {
+            text-align: center;
+            padding: 1.25rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--color-accent-light);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* --- FAQ --- */
+        .faq-item {
+            border-bottom: 1px solid var(--color-border);
+            padding: 1.25rem 0;
+        }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-q {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+        }
+        .faq-a {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            line-height: 1.65;
+        }
+        .faq-a code {
+            background: var(--color-surface-2);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        /* --- Architecture Table --- */
+        .arch-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        .arch-table th, .arch-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .arch-table th {
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        .arch-table td:first-child {
+            color: var(--color-accent-light);
+            font-weight: 600;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            border-top: 1px solid var(--color-border);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+        .footer-brand {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .footer-brand a {
+            color: var(--color-accent-light);
+            text-decoration: none;
+        }
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+            list-style: none;
+        }
+        .footer-links a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--color-accent-light); }
+        .footer-copy {
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 640px) {
+            .nav-links { gap: 1rem; }
+            .hero { padding: 3rem 1rem 2rem; }
+            section { padding: 2.5rem 1rem; }
+            .pipeline { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+    <div class="nav-inner">
+        <a href="#" class="nav-brand">docx-to-json</a>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#quickstart">Quick Start</a></li>
+            <li><a href="#pipeline">Pipeline</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="https://github.com/arjunghosh/docx-to-json-test-case-converter">GitHub</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-badge">Open Source &middot; v3.0.0 &middot; MIT License</div>
+    <h1>Convert Word Test Cases to JSON for AI Evaluation</h1>
+    <p>
+        A Python CLI tool and library that parses structured <strong>.docx</strong> test-case documents
+        into validated <strong>JSON + JSONL</strong> files, ready for Azure AI Foundry, Microsoft Co-Pilot Studio,
+        and any AI agent evaluation pipeline.
+    </p>
+    <div class="hero-actions">
+        <a href="https://github.com/arjunghosh/docx-to-json-test-case-converter" class="btn btn-primary">
+            View on GitHub
+        </a>
+        <a href="#quickstart" class="btn btn-secondary">
+            Get Started
+        </a>
+    </div>
+</div>
+
+<!-- Stats -->
+<section style="padding-top: 0;">
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-value">45+</div>
+            <div class="stat-label">QA Checks</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">11</div>
+            <div class="stat-label">Validation Categories</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Output Formats</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">Dual</div>
+            <div class="stat-label">CLI + Library Mode</div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+    <h2>Features</h2>
+    <p class="section-sub">Everything you need to go from Word document to AI-ready test data.</p>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">&#128196;</div>
+            <h3>DOCX Parsing</h3>
+            <p>State-machine parser extracts sections, test cases, prompts, expected behaviors, pass/fail criteria, and preconditions from structured Word documents.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#128202;</div>
+            <h3>Dual Output</h3>
+            <p>Generates both hierarchical <code>.json</code> and flat <code>.jsonl</code> (one test per line) for direct upload to Azure AI Foundry evaluation.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9989;</div>
+            <h3>45+ QA Checks</h3>
+            <p>Embedded test suite validates structure, completeness, field integrity, AI Foundry compatibility, prompt quality, and cross-reference consistency.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#128269;</div>
+            <h3>Delta-Diff Validator</h3>
+            <p>Compares source DOCX against JSON output to detect prompt drift, missing entries, extra entries, and keyword loss with similarity scoring.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#128260;</div>
+            <h3>Regression Detection</h3>
+            <p>JSON-to-JSON comparator detects drift between conversion runs -- metadata, prompts, behaviors, and structural changes.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9997;&#65039;</div>
+            <h3>Dual Mode</h3>
+            <p>Works as a CLI tool (<code>python docx_to_json_tool.py convert</code>) and as a Python library (<code>from docx_to_json_tool import convert_docx</code>).</p>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Start -->
+<section id="quickstart">
+    <h2>Quick Start</h2>
+    <p class="section-sub">Up and running in under a minute.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <div class="dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+            </div>
+            <span>Terminal</span>
+        </div>
+        <pre><code><span class="code-comment"># Clone the repository</span>
+<span class="code-keyword">git clone</span> <span class="code-string">https://github.com/arjunghosh/docx-to-json-test-case-converter.git</span>
+<span class="code-keyword">cd</span> docx-to-json-test-case-converter
+
+<span class="code-comment"># Install dependencies</span>
+<span class="code-keyword">pip install</span> python-docx pytest
+
+<span class="code-comment"># Convert your test cases</span>
+<span class="code-keyword">python</span> docx_to_json_tool.py <span class="code-fn">convert</span> <span class="code-string">your_test_cases.docx</span>
+
+<span class="code-comment"># Or use as a Python library</span>
+<span class="code-keyword">from</span> docx_to_json_tool <span class="code-keyword">import</span> <span class="code-fn">convert_docx</span>
+result = <span class="code-fn">convert_docx</span>(<span class="code-string">"your_test_cases.docx"</span>)
+print(result[<span class="code-string">"status"</span>])      <span class="code-comment"># "PASS" or "FAIL"</span>
+print(result[<span class="code-string">"jsonl_path"</span>])  <span class="code-comment"># path to .jsonl output</span></code></pre>
+    </div>
+</section>
+
+<!-- Pipeline -->
+<section id="pipeline">
+    <h2>What Happens When You Run Convert</h2>
+    <p class="section-sub">A single command triggers the full quality pipeline.</p>
+    <div class="pipeline">
+        <div class="pipeline-step">
+            <div class="step-num">1</div>
+            <h4>Parse DOCX</h4>
+            <p>Extract sections, tests, prompts, behaviors</p>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-num">2</div>
+            <h4>Write JSON</h4>
+            <p>Structured hierarchical output</p>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-num">3</div>
+            <h4>Write JSONL</h4>
+            <p>Flat format for AI Foundry</p>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-num">4</div>
+            <h4>QA Suite</h4>
+            <p>Run ~45 validation checks</p>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-num">5</div>
+            <h4>Delta-Diff</h4>
+            <p>Compare DOCX vs JSON</p>
+        </div>
+        <div class="pipeline-step">
+            <div class="step-num">6</div>
+            <h4>Report</h4>
+            <p>Generate validation report</p>
+        </div>
+    </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+    <h2>Architecture</h2>
+    <p class="section-sub">Single-module design with 10 composable sections.</p>
+    <table class="arch-table">
+        <thead>
+            <tr><th>#</th><th>Component</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Output Folder Management</td><td>Creates timestamped output directories</td></tr>
+            <tr><td>2</td><td>DOCX Parser</td><td>State-machine parser for structured test-case documents</td></tr>
+            <tr><td>3</td><td>JSONL Generator</td><td>Flattens hierarchical data into AI Foundry format</td></tr>
+            <tr><td>4</td><td>Delta-Diff Validator</td><td>DOCX-vs-JSON drift detection with similarity scoring</td></tr>
+            <tr><td>5</td><td>JSON Structure Validator</td><td>Schema and field validation</td></tr>
+            <tr><td>6</td><td>Embedded Test Suite</td><td>~45 generic QA checks across 11 categories</td></tr>
+            <tr><td>7</td><td>JSON-to-JSON Comparator</td><td>Regression detection between conversion runs</td></tr>
+            <tr><td>8</td><td>CLI Report Printers</td><td>Formatted terminal output for all reports</td></tr>
+            <tr><td>9</td><td>Library API</td><td><code>convert_docx()</code> -- single-function pipeline</td></tr>
+            <tr><td>10</td><td>CLI Commands</td><td><code>convert</code>, <code>validate</code>, <code>compare</code>, <code>full</code></td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+    <h2>Frequently Asked Questions</h2>
+    <p class="section-sub">Common questions about the tool, format, and integration.</p>
+
+    <div class="faq-item">
+        <div class="faq-q">How do I convert a Word document to JSON for AI testing?</div>
+        <div class="faq-a">
+            Install the dependency with <code>pip install python-docx</code>, then run
+            <code>python docx_to_json_tool.py convert your_test_cases.docx</code>.
+            The tool parses structured test cases and outputs validated JSON and JSONL files
+            ready for Azure AI Foundry or any AI agent evaluation pipeline.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-q">What format does the DOCX file need to be in?</div>
+        <div class="faq-a">
+            The tool expects Word documents with sections marked as <code>SECTION N --- Title</code>,
+            individual tests as <code>Test N</code>, <code>User Prompt:</code> fields,
+            <code>Expected Behavior:</code> bullet lists, and optional <code>Pass if:</code> / <code>Fail if:</code> criteria.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-q">Can I use this as a Python library instead of CLI?</div>
+        <div class="faq-a">
+            Yes. Import <code>convert_docx</code> from <code>docx_to_json_tool</code> and call
+            <code>result = convert_docx("my_tests.docx")</code>. It returns a dict with status,
+            file paths, parsed data, and all validation reports. You can also import individual
+            functions like <code>parse_test_cases_from_docx</code>, <code>generate_jsonl</code>,
+            and <code>run_generic_test_suite</code>.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-q">What is the JSONL format used for Azure AI Foundry?</div>
+        <div class="faq-a">
+            Each line is a self-contained JSON object with <code>test_id</code>, <code>section</code>,
+            <code>user_prompt</code>, <code>expected_behavior</code> (array), and optional
+            <code>pass_criteria</code>, <code>fail_criteria</code>, and <code>precondition</code> fields.
+            Upload this file directly to AI Foundry's evaluation framework.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-q">Does it work with Microsoft Co-Pilot Studio test cases?</div>
+        <div class="faq-a">
+            Yes. The tool supports any structured test-case document following the expected DOCX format,
+            including those authored for Microsoft Co-Pilot Studio, Power BI AI agents, and Azure AI Foundry.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-q">How many validation checks are run?</div>
+        <div class="faq-a">
+            Approximately 45 automated QA checks across 11 categories: JSON structure, completeness,
+            field validation, expected behavior content, special fields, AI Foundry compatibility,
+            data type integrity, section integrity, prompt quality, delta-diff, and cross-reference consistency.
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-brand">
+        Built by <a href="https://www.loyla.ai/">Arjun Ghosh</a> &middot;
+        <a href="https://www.loyla.ai/">Loyla.ai</a> -- Multi-Agentic AI Products Lab
+    </div>
+    <ul class="footer-links">
+        <li><a href="https://github.com/arjunghosh/docx-to-json-test-case-converter">GitHub</a></li>
+        <li><a href="https://github.com/arjunghosh">@arjunghosh</a></li>
+        <li><a href="https://linkedin.com/in/arjunghosh">LinkedIn</a></li>
+        <li><a href="https://twitter.com/arjunghosh">X / Twitter</a></li>
+        <li><a href="https://www.loyla.ai/">Loyla.ai</a></li>
+    </ul>
+    <div class="footer-copy">
+        &copy; 2025 Arjun Ghosh / Loyla.ai &middot; MIT License
+    </div>
+</footer>
+
+</body>
+</html>

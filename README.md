@@ -1,8 +1,31 @@
-# DOCX-to-JSON Test Case Converter & Validator (v3)
+<p align="center">
+  <h1 align="center">DOCX-to-JSON Test Case Converter & Validator</h1>
+  <p align="center">
+    <strong>Convert structured Word test-case documents into validated JSON + JSONL for AI evaluation pipelines</strong>
+  </p>
+  <p align="center">
+    <a href="#features">Features</a> &middot;
+    <a href="#quick-start">Quick Start</a> &middot;
+    <a href="#usage">Usage</a> &middot;
+    <a href="#architecture">Architecture</a> &middot;
+    <a href="#api-reference">API Reference</a> &middot;
+    <a href="#contributing">Contributing</a>
+  </p>
+  <p align="center">
+    <img src="https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+">
+    <img src="https://img.shields.io/badge/version-3.0.0-green?style=flat-square" alt="Version 3.0.0">
+    <img src="https://img.shields.io/badge/license-MIT-orange?style=flat-square" alt="MIT License">
+    <img src="https://img.shields.io/badge/tests-45%2B%20checks-brightgreen?style=flat-square" alt="45+ QA Checks">
+  </p>
+</p>
 
-A standalone Python CLI tool and library that converts structured Word (.docx) test-case documents into validated **JSON + JSONL** files suitable for **Azure AI Foundry** agent evaluation upload.
+---
 
-Built for the **Microsoft Co-Pilot Studio / Power BI / AI Foundry** project at Flexilytics.
+## Why This Tool?
+
+If you work with **Azure AI Foundry**, **Microsoft Co-Pilot Studio**, or any AI agent evaluation pipeline, you likely have test cases authored in Word documents. Getting those into machine-readable JSON/JSONL for automated evaluation is tedious and error-prone.
+
+This tool automates the entire pipeline -- **parse, convert, validate, and report** -- in a single command, with ~45 built-in quality checks to ensure nothing is lost in translation.
 
 ---
 
@@ -15,8 +38,27 @@ Built for the **Microsoft Co-Pilot Studio / Power BI / AI Foundry** project at F
 - **JSON Structure Validator** -- Validates schema compliance for AI Foundry compatibility
 - **JSON-to-JSON Comparator** -- Detects drift/regression between two conversion runs
 - **Idempotent Parser** -- Produces identical output on consecutive runs of the same input
-- **Dual-Mode Design** -- Works as both a CLI tool (`python docx_to_json_tool.py convert ...`) and a Python library (`from docx_to_json_tool import convert_docx`)
+- **Dual-Mode Design** -- Works as both a CLI tool and a Python library (`from docx_to_json_tool import convert_docx`)
 - **Smart Text Normalization** -- Handles Unicode smart quotes, em-dashes, ellipses, and other special characters
+
+---
+
+## Quick Start
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/arjunghosh/docx-to-json-test-case-converter.git
+cd docx-to-json-test-case-converter
+
+# 2. Install dependencies
+pip install python-docx pytest
+
+# 3. Convert your first DOCX
+python docx_to_json_tool.py convert your_test_cases.docx
+
+# 4. Check the output
+ls output_*/   # timestamped folder with .json, .jsonl, and validation report
+```
 
 ---
 
@@ -24,42 +66,11 @@ Built for the **Microsoft Co-Pilot Studio / Power BI / AI Foundry** project at F
 
 ```
 docx-to-json-test-case-converter/
-  docx_to_json_tool.py        # Main tool (CLI + library API, ~1200 lines)
-  test_docx_to_json.py         # Pytest suite (11 test classes, ~350 lines)
+  docx_to_json_tool.py        # Main tool -- CLI + library API (~1200 lines)
+  test_docx_to_json.py         # Pytest suite -- 11 test classes (~350 lines)
   README.md                    # This file
   .gitignore                   # Git ignore rules
-  sample/
-    OIT4-Test_Cases.docx       # Sample input for testing
-```
-
----
-
-## Architecture
-
-The tool is organized into 10 sections within a single module:
-
-| Section | Component | Description |
-|---------|-----------|-------------|
-| 1 | Output Folder Management | Creates timestamped output directories |
-| 2 | DOCX Parser | State-machine parser for structured test-case documents |
-| 3 | JSONL Generator | Flattens hierarchical data into AI Foundry format |
-| 4 | Delta-Diff Validator | DOCX-vs-JSON drift detection with similarity scoring |
-| 5 | JSON Structure Validator | Schema and field validation |
-| 6 | Embedded Test Suite | ~45 generic QA checks (runs on any DOCX) |
-| 7 | JSON-to-JSON Comparator | Regression detection between conversion runs |
-| 8 | CLI Report Printers | Formatted terminal output for all reports |
-| 9 | Library API | `convert_docx()` -- single-function pipeline for programmatic use |
-| 10 | CLI Commands | `convert`, `validate`, `compare`, `full` subcommands |
-
----
-
-## Requirements
-
-- **Python** 3.10+
-- **Dependencies:**
-
-```bash
-pip install python-docx pytest
+  sample/                      # Sample DOCX files for testing
 ```
 
 ---
@@ -70,10 +81,11 @@ pip install python-docx pytest
 
 ```bash
 # Convert a DOCX -> JSON + JSONL (with full QA pipeline)
-python docx_to_json_tool.py convert sample/OIT4-Test_Cases.docx
+python docx_to_json_tool.py convert my_test_cases.docx
 
-# Absolute path
-python docx_to_json_tool.py convert /Users/arjunghosh/Documents/my_tests.docx
+# Absolute or relative paths both work
+python docx_to_json_tool.py convert ./sample/OIT4-Test_Cases.docx
+python docx_to_json_tool.py convert /path/to/my_tests.docx
 
 # Path with spaces (use quotes)
 python docx_to_json_tool.py convert "~/My Documents/test cases.docx"
@@ -139,9 +151,13 @@ report = run_generic_test_suite("output.json", "my_tests.docx")
 print(f"{report['passed']}/{report['total_tests']} checks passed")
 ```
 
-### Library API Return Value
+---
 
-`convert_docx()` returns a dict with:
+## API Reference
+
+### `convert_docx(docx_path, output_dir=None, quiet=False) -> dict`
+
+Full conversion pipeline. Returns:
 
 | Key | Type | Description |
 |-----|------|-------------|
@@ -154,6 +170,36 @@ print(f"{report['passed']}/{report['total_tests']} checks passed")
 | `test_report` | `dict` | Embedded test suite results |
 | `diff_report` | `dict` | Delta-diff results |
 | `struct_report` | `dict` | Structure validation results |
+
+### Individual Functions
+
+| Function | Description |
+|----------|-------------|
+| `parse_test_cases_from_docx(docx_path)` | Parse DOCX into structured dict |
+| `generate_jsonl(data, jsonl_path)` | Write flat JSONL from parsed data |
+| `validate_json_structure(json_path)` | Validate JSON schema compliance |
+| `run_delta_diff(docx_path, json_path)` | Compare DOCX source vs JSON output |
+| `run_generic_test_suite(json_path, docx_path)` | Run ~45 QA checks |
+| `compare_json_outputs(old_path, new_path)` | Diff two JSON outputs |
+
+---
+
+## Architecture
+
+The tool is organized into 10 sections within a single module:
+
+| # | Component | Description |
+|---|-----------|-------------|
+| 1 | Output Folder Management | Creates timestamped output directories |
+| 2 | DOCX Parser | State-machine parser for structured test-case documents |
+| 3 | JSONL Generator | Flattens hierarchical data into AI Foundry format |
+| 4 | Delta-Diff Validator | DOCX-vs-JSON drift detection with similarity scoring |
+| 5 | JSON Structure Validator | Schema and field validation |
+| 6 | Embedded Test Suite | ~45 generic QA checks (runs on any DOCX) |
+| 7 | JSON-to-JSON Comparator | Regression detection between conversion runs |
+| 8 | CLI Report Printers | Formatted terminal output for all reports |
+| 9 | Library API | `convert_docx()` -- single-function pipeline for programmatic use |
+| 10 | CLI Commands | `convert`, `validate`, `compare`, `full` subcommands |
 
 ---
 
@@ -245,9 +291,9 @@ Each conversion run creates a timestamped folder:
 
 ```
 output_sample_20250409_185000/
-  OIT4-Test_Cases.json               # Structured JSON output
-  OIT4-Test_Cases.jsonl              # Flat JSONL for AI Foundry
-  OIT4-Test_Cases_validation_report.json  # Full validation report
+  my_test_cases.json                    # Structured JSON output
+  my_test_cases.jsonl                   # Flat JSONL for AI Foundry
+  my_test_cases_validation_report.json  # Full validation report
 ```
 
 ---
@@ -270,12 +316,44 @@ The embedded test suite validates across 11 categories:
 
 ---
 
+## Use Cases
+
+- **Azure AI Foundry** -- Convert test-case documents into JSONL for agent evaluation upload
+- **Microsoft Co-Pilot Studio** -- Validate test coverage for Co-Pilot agent testing
+- **Power BI AI Agents** -- Structured test case management for BI agent QA
+- **Any AI Agent Testing** -- Generic enough to work with any structured test-case DOCX
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
 ## License
 
-Internal tool -- Flexilytics / Microsoft Co-Pilot Studio project.
+This project is licensed under the **MIT License** -- see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Author
 
-Arjun Ghosh -- Flexilytics AI Projects
+**Arjun Ghosh**
+Founder, [Loyla.ai](https://www.loyla.ai/) -- Multi-Agentic AI Products Lab
+
+- GitHub: [@arjunghosh](https://github.com/arjunghosh)
+- LinkedIn: [in/arjunghosh](https://linkedin.com/in/arjunghosh)
+- X / Twitter: [@arjunghosh](https://twitter.com/arjunghosh)
+
+---
+
+<p align="center">
+  Built with care at <a href="https://www.loyla.ai/">Loyla.ai</a> -- Multi-Agentic AI Products Lab
+</p>
